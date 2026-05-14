@@ -2,9 +2,9 @@ import bcrypt from "bcryptjs";
 import { AppError } from "../utils/AppError";
 import { signAuthToken } from "../utils/jwt";
 import { UserRepository } from "../repositories/UserRepository";
-import { EmailService } from "./EmailService";
 import { AnalyticsService } from "./AnalyticsService";
 import type { PublicUser } from "../types/user";
+import { EmailQueueProducer } from "../queues/producers/EmailQueueProducer";
 
 export interface RegisterCommand {
   email: string;
@@ -25,7 +25,7 @@ export interface AuthResult {
 export class AuthService {
   constructor(
     private readonly userRepository: UserRepository,
-    private readonly emailService: EmailService,
+    private readonly emailProduces: EmailQueueProducer,
     private readonly analyticsService: AnalyticsService
   ) { }
 
@@ -45,7 +45,11 @@ export class AuthService {
     const publicUser = toPublicUser(user);
 
     // These side effects are isolated so they can later become queued jobs without changing controller code.
-    await this.emailService.sendWelcomeEmail(publicUser.email, publicUser.name);
+    await this.emailProduces.enqueueWelcomeEmail({
+      email: publicUser.email,
+      name: publicUser.name,
+      userId: publicUser.id
+    })
     await this.analyticsService.trackEvent({
       userId: publicUser.id,
       eventName: "user_registered",

@@ -1,11 +1,10 @@
-import { ConsoleEmailProvider } from "./infrastructure/email/ConsoleEmailProvider";
 import { AnalyticsRepository } from "./repositories/AnalyticsRepository";
 import { ImageRepository } from "./repositories/ImageRepository";
 import { NotificationRepository } from "./repositories/NotificationRepository";
 import { UserRepository } from "./repositories/UserRepository";
 import { AnalyticsService } from "./services/AnalyticsService";
 import { AuthService } from "./services/AuthService";
-import { EmailService } from "./services/EmailService";
+import { EmailQueueProducer } from "./queues/producers/EmailQueueProducer";
 import { FileProcessingService } from "./services/FileProcessingService";
 import { ImageService } from "./services/ImageService";
 import { NotificationService } from "./services/NotificationService";
@@ -20,19 +19,12 @@ const imageRepository = new ImageRepository();
 const notificationRepository = new NotificationRepository();
 const analyticsRepository = new AnalyticsRepository();
 
-const emailProvider = new ConsoleEmailProvider();
-
-const emailService = new EmailService(emailProvider);
+const emailQueueProducer = new EmailQueueProducer();
 const analyticsService = new AnalyticsService(analyticsRepository);
 const notificationService = new NotificationService(notificationRepository);
 const fileProcessingService = new FileProcessingService(imageRepository);
-const authService = new AuthService(userRepository, emailService, analyticsService);
-const imageService = new ImageService(
-  imageRepository,
-  fileProcessingService,
-  notificationService,
-  analyticsService
-);
+const authService = new AuthService(userRepository, emailQueueProducer, analyticsService);
+const imageService = new ImageService(imageRepository, fileProcessingService, notificationService, analyticsService);
 
 export const container = {
   controllers: {
@@ -42,7 +34,6 @@ export const container = {
     analyticsController: new AnalyticsController(analyticsService)
   },
   services: {
-    emailService,
     analyticsService,
     notificationService,
     fileProcessingService,
