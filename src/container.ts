@@ -12,6 +12,7 @@ import { AnalyticsController } from "./controllers/AnalyticsController";
 import { AuthController } from "./controllers/AuthController";
 import { ImageController } from "./controllers/ImageController";
 import { NotificationController } from "./controllers/NotificationController";
+import { NotificationQueueProducer } from "./queues/producers/NotificationQueueProducer";
 
 // The container is the app's composition root. Swapping implementations stays localized here.
 const userRepository = new UserRepository();
@@ -24,7 +25,8 @@ const analyticsService = new AnalyticsService(analyticsRepository);
 const notificationService = new NotificationService(notificationRepository);
 const fileProcessingService = new FileProcessingService(imageRepository);
 const authService = new AuthService(userRepository, emailQueueProducer, analyticsService);
-const imageService = new ImageService(imageRepository, fileProcessingService, notificationService, analyticsService);
+const notificationProducer = new NotificationQueueProducer();
+const imageService = new ImageService(imageRepository, fileProcessingService, notificationProducer, analyticsService);
 
 export const container = {
   controllers: {

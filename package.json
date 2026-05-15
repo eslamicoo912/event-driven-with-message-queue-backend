@@ -10,7 +10,9 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "dev:worker:email": "tsx watch src/queues/workers/emailWorkerRunner.ts",
-    "start:worker:email": "node dist/queues/workers/emailWorkerRunner.js"
+    "start:worker:email": "node dist/queues/workers/emailWorkerRunner.js",
+    "dev:worker:notification": "tsx watch src/queues/workers/notificationWorkerRunner.ts",
+    "start:worker:notification": "node dist/queues/workers/notificationWorkerRunner.js"
   },
   "keywords": [
     "express",

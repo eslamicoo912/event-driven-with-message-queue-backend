@@ -25,7 +25,7 @@ export interface AuthResult {
 export class AuthService {
   constructor(
     private readonly userRepository: UserRepository,
-    private readonly emailProduces: EmailQueueProducer,
+    private readonly emailProducer: EmailQueueProducer,
     private readonly analyticsService: AnalyticsService
   ) { }
 
@@ -45,7 +45,7 @@ export class AuthService {
     const publicUser = toPublicUser(user);
 
     // These side effects are isolated so they can later become queued jobs without changing controller code.
-    await this.emailProduces.enqueueWelcomeEmail({
+    await this.emailProducer.enqueueWelcomeEmail({
       email: publicUser.email,
       name: publicUser.name,
       userId: publicUser.id

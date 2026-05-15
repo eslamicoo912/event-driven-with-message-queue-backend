@@ -1,8 +1,8 @@
 import type { ImageAssetDocument } from "../models/ImageAsset";
+import { NotificationQueueProducer } from "../queues/producers/NotificationQueueProducer";
 import { ImageRepository } from "../repositories/ImageRepository";
 import { AnalyticsService } from "./AnalyticsService";
 import { FileProcessingService } from "./FileProcessingService";
-import { NotificationService } from "./NotificationService";
 
 export interface UploadImageCommand {
   userId: string;
@@ -16,9 +16,9 @@ export class ImageService {
   constructor(
     private readonly imageRepository: ImageRepository,
     private readonly fileProcessingService: FileProcessingService,
-    private readonly notificationService: NotificationService,
+    private readonly notificationProducer: NotificationQueueProducer,
     private readonly analyticsService: AnalyticsService
-  ) {}
+  ) { }
 
   async uploadImage(command: UploadImageCommand): Promise<ImageAssetDocument> {
     const image = await this.imageRepository.create({
@@ -36,7 +36,7 @@ export class ImageService {
       mimeType: command.mimeType
     });
 
-    await this.notificationService.createNotification({
+    await this.notificationProducer.enqueueNotification({
       userId: command.userId,
       type: "image_uploaded",
       title: "Image uploaded",
