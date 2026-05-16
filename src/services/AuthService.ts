@@ -2,9 +2,9 @@ import bcrypt from "bcryptjs";
 import { AppError } from "../utils/AppError";
 import { signAuthToken } from "../utils/jwt";
 import { UserRepository } from "../repositories/UserRepository";
-import { AnalyticsService } from "./AnalyticsService";
 import type { PublicUser } from "../types/user";
 import { EmailQueueProducer } from "../queues/producers/EmailQueueProducer";
+import { AnalyticsQueueProducer } from "../queues/producers/AnalyticsQueueProducer";
 
 export interface RegisterCommand {
   email: string;
@@ -26,7 +26,7 @@ export class AuthService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly emailProducer: EmailQueueProducer,
-    private readonly analyticsService: AnalyticsService
+    private readonly analyticsProducer: AnalyticsQueueProducer
   ) { }
 
   async register(command: RegisterCommand): Promise<AuthResult> {
@@ -50,7 +50,7 @@ export class AuthService {
       name: publicUser.name,
       userId: publicUser.id
     })
-    await this.analyticsService.trackEvent({
+    await this.analyticsProducer.enqueueTrackAnalyticsJob({
       userId: publicUser.id,
       eventName: "user_registered",
       properties: { email: publicUser.email }
@@ -75,7 +75,7 @@ export class AuthService {
 
     const publicUser = toPublicUser(user);
 
-    await this.analyticsService.trackEvent({
+    await this.analyticsProducer.enqueueTrackAnalyticsJob({
       userId: publicUser.id,
       eventName: "user_logged_in"
     });

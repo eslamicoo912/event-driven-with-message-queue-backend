@@ -12,7 +12,9 @@
     "dev:worker:email": "tsx watch src/queues/workers/emailWorkerRunner.ts",
     "start:worker:email": "node dist/queues/workers/emailWorkerRunner.js",
     "dev:worker:notification": "tsx watch src/queues/workers/notificationWorkerRunner.ts",
-    "start:worker:notification": "node dist/queues/workers/notificationWorkerRunner.js"
+    "start:worker:notification": "node dist/queues/workers/notificationWorkerRunner.js",
+    "dev:worker:analytics": "tsx watch src/queues/workers/analyticsWorkerRunner.ts",
+    "start:worker:analytics": "node dist/queues/workers/analyticsWorkerRunner.js"
   },
   "keywords": [
     "express",
