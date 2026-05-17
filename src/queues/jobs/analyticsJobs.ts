@@ -5,5 +5,5 @@ export const ANALYTICS_JOBS_NAMES = {
 export interface TrackAnalyticsJobData {
     userId: string;
     eventName: string;
-    properties?: { email: string };
+    properties?: Record<string, unknown>
 }

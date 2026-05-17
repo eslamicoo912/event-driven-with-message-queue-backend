@@ -1,8 +1,8 @@
 import type { ImageAssetDocument } from "../models/ImageAsset";
+import { AnalyticsQueueProducer } from "../queues/producers/AnalyticsQueueProducer";
+import { FileProcessingQueueProducer } from "../queues/producers/FileProcessingQueueProducer";
 import { NotificationQueueProducer } from "../queues/producers/NotificationQueueProducer";
 import { ImageRepository } from "../repositories/ImageRepository";
-import { AnalyticsService } from "./AnalyticsService";
-import { FileProcessingService } from "./FileProcessingService";
 
 export interface UploadImageCommand {
   userId: string;
@@ -15,9 +15,9 @@ export interface UploadImageCommand {
 export class ImageService {
   constructor(
     private readonly imageRepository: ImageRepository,
-    private readonly fileProcessingService: FileProcessingService,
+    private readonly fileProcessingProducer: FileProcessingQueueProducer,
     private readonly notificationProducer: NotificationQueueProducer,
-    private readonly analyticsService: AnalyticsService
+    private readonly analyticsQueueProducer: AnalyticsQueueProducer
   ) { }
 
   async uploadImage(command: UploadImageCommand): Promise<ImageAssetDocument> {
@@ -30,7 +30,7 @@ export class ImageService {
     });
 
     // Queue-ready boundaries: each call below can later become an enqueue operation.
-    await this.fileProcessingService.processUploadedImage({
+    await this.fileProcessingProducer.enqueueFileProcessingJob({
       imageId: image._id.toString(),
       path: command.path,
       mimeType: command.mimeType
@@ -43,7 +43,7 @@ export class ImageService {
       message: "Your image was uploaded and is ready for processing."
     });
 
-    await this.analyticsService.trackEvent({
+    await this.analyticsQueueProducer.enqueueTrackAnalyticsJob({
       userId: command.userId,
       eventName: "image_uploaded",
       properties: {

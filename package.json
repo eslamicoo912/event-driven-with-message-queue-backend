@@ -14,7 +14,9 @@
     "dev:worker:notification": "tsx watch src/queues/workers/notificationWorkerRunner.ts",
     "start:worker:notification": "node dist/queues/workers/notificationWorkerRunner.js",
     "dev:worker:analytics": "tsx watch src/queues/workers/analyticsWorkerRunner.ts",
-    "start:worker:analytics": "node dist/queues/workers/analyticsWorkerRunner.js"
+    "start:worker:analytics": "node dist/queues/workers/analyticsWorkerRunner.js",
+    "dev:worker:fileprocessing": "tsx watch src/queues/workers/fileProcessingWorkerRunner.ts",
+    "start:worker:fileprocessing": "node dist/queues/workers/fileProcessingWorkerRunner.js"
   },
   "keywords": [
     "express",
